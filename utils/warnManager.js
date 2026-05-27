@@ -4,14 +4,16 @@
  * ║   Comisión Disciplinaria Digital | LigaPro Ecuabet x4       ║
  * ╚══════════════════════════════════════════════════════════════╝
  *
- * Escala de sanciones por links:
- *  Adv. 1 → Aislamiento 2h   (timeout completo)
- *  Adv. 2 → Ban temporal 4h
+ * NOTA: Antes de llegar aquí, el usuario ya recibió advertencias
+ * verbales (3 para links, 2 para spam/menciones). Esta escala
+ * se aplica solo cuando el usuario insiste tras las advertencias.
+ *
+ * Escala de sanciones formales:
+ *  Adv. 1 → Aislamiento 1h   (timeout)
+ *  Adv. 2 → Aislamiento 4h   (timeout)
  *  Adv. 3 → Ban temporal 12h
  *  Adv. 4 → Expulsión (kick)
- *  Adv. 5 → Expulsión (kick)
- *  Adv. 6 → Expulsión (kick)
- *  Adv. 7+ → Ban permanente
+ *  Adv. 5+ → Ban permanente
  */
 
 const fs   = require('fs');
@@ -136,12 +138,10 @@ function getPendingTempBans() {
  */
 function getSanctionInfo(warnCount) {
   switch (warnCount) {
-    case 1: return { type: 'TIMEOUT',   durationMs: 2 * 60 * 60 * 1000,  label: '⏸️ Aislamiento 2 horas' };
-    case 2: return { type: 'TEMPBAN',   durationMs: 4 * 60 * 60 * 1000,  label: '🟨 Ban temporal 4 horas' };
+    case 1: return { type: 'TIMEOUT',   durationMs: 1 * 60 * 60 * 1000,  label: '⏸️ Aislamiento 1 hora' };
+    case 2: return { type: 'TIMEOUT',   durationMs: 4 * 60 * 60 * 1000,  label: '⏸️ Aislamiento 4 horas' };
     case 3: return { type: 'TEMPBAN',   durationMs: 12 * 60 * 60 * 1000, label: '🟧 Ban temporal 12 horas' };
     case 4: return { type: 'KICK',      durationMs: 0,                    label: '🟥 Expulsión del servidor' };
-    case 5: return { type: 'KICK',      durationMs: 0,                    label: '🟥 Expulsión del servidor' };
-    case 6: return { type: 'KICK',      durationMs: 0,                    label: '🟥 Expulsión del servidor' };
     default: return { type: 'PERMBAN',  durationMs: 0,                    label: '🚫 Ban permanente' };
   }
 }

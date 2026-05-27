@@ -55,11 +55,13 @@ const joinBurst      = new Map();
 const adminLinkTracker = new Map();
 /** Map<userId, number> */
 const adminStrikes   = new Map();
+/** Map<userId, { spam: number, mentions: number, lastInfraction: number }> */
+const warningTracker = new Map();
 
 // ── UMBRALES DE DETECCIÓN ───────────────────────────────────────
 const THRESHOLDS = {
   // Mensajes por usuario en X ms
-  SPAM_MSG_COUNT:    6,
+  SPAM_MSG_COUNT:    8,
   SPAM_MSG_WINDOW:   5_000,
   // Joins rápidos al servidor
   JOIN_BURST_COUNT:  8,
@@ -77,13 +79,18 @@ const THRESHOLDS = {
   ADMIN_LINK_SPAM_COUNT:  20,
   ADMIN_LINK_SPAM_WINDOW: 10_000,
   // Menciones masivas
-  MENTION_COUNT:     5,
+  MENTION_COUNT:     6,
   MENTION_WINDOW:    5_000,
   // Tickets / embeds masivos
   TICKET_COUNT:      3,
   TICKET_WINDOW:     30_000,
   // Duración lockdown automático (ms)
   LOCKDOWN_DURATION: 15 * 60 * 1000,
+  // ── ADVERTENCIAS (sistema flexible) ────────────────
+  SPAM_WARN_MAX:     2,            // advertencias verbales antes de sancionar por spam
+  MENTION_WARN_MAX:  2,            // advertencias verbales antes de sancionar por menciones
+  LINK_WARN_MAX:     3,            // advertencias visibles antes de escalar a sanción formal por links
+  WARNING_DECAY:     5 * 60_000,   // 5 minutos sin infracciones → se resetean advertencias
 };
 
 // ── COMANDOS PELIGROSOS QUE SE DESHABILITAN EN LOCKDOWN ─────────
@@ -351,4 +358,5 @@ module.exports = {
   joinBurst,
   adminLinkTracker,
   adminStrikes,
+  warningTracker,
 };
