@@ -3,6 +3,15 @@ const { Client, GatewayIntentBits, Collection, Partials } = require('discord.js'
 const { loadCommands, registerCommands } = require('./handlers/commandHandler');
 const { loadEvents } = require('./handlers/eventHandler');
 
+// ── MANEJO GLOBAL DE ERRORES ──
+// Evita que el bot se apague completamente por un error no capturado.
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 [Global Error] Rechazo de promesa no manejado:', reason);
+});
+process.on('uncaughtException', (error) => {
+  console.error('💥 [Global Error] Excepción no capturada:', error);
+});
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,

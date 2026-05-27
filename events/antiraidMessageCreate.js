@@ -352,6 +352,14 @@ module.exports = {
       // ── GIFs PERMITIDOS: no se tocan, se ignoran completamente ──
       if (isGifOnly(message.content)) return;
 
+      // ── EXCEPCIÓN: TICKETS DE PARTNER ──
+      if (global.ticketData && global.ticketData.tickets) {
+        const isPartnerTicket = Object.values(global.ticketData.tickets).some(
+          t => t.channelId === message.channel.id && t.type === '🤝 Partner' && t.status === 'open'
+        );
+        if (isPartnerTicket) return; // Permitir enviar links libremente aquí
+      }
+
       // Eliminar el mensaje con link (siempre)
       await message.delete().catch(() => {});
 

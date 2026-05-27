@@ -30,16 +30,21 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 //  ADVERTENCIAS PERSISTENTES
 // ═══════════════════════════════════════════════════════════════
 
+let cachedWarns = null;
+
 /** @returns {{ [userId: string]: { count: number, history: Array<{ts:number,reason:string}> } }} */
 function loadWarns() {
+  if (cachedWarns) return cachedWarns;
   try {
-    if (!fs.existsSync(WARNS_PATH)) return {};
-    return JSON.parse(fs.readFileSync(WARNS_PATH, 'utf8'));
-  } catch (_) { return {}; }
+    if (!fs.existsSync(WARNS_PATH)) cachedWarns = {};
+    else cachedWarns = JSON.parse(fs.readFileSync(WARNS_PATH, 'utf8'));
+  } catch (_) { cachedWarns = {}; }
+  return cachedWarns;
 }
 
 function saveWarns(data) {
-  try { fs.writeFileSync(WARNS_PATH, JSON.stringify(data, null, 2)); } catch (_) {}
+  cachedWarns = data;
+  fs.promises.writeFile(WARNS_PATH, JSON.stringify(data, null, 2)).catch(e => console.error('[WarnManager] Error saving warns:', e));
 }
 
 /**
@@ -87,16 +92,21 @@ function getAllWarns() {
 //  TEMP BANS PERSISTENTES
 // ═══════════════════════════════════════════════════════════════
 
+let cachedTempBans = null;
+
 /** @returns {{ [userId: string]: { guildId: string, unbanAt: number } }} */
 function loadTempBans() {
+  if (cachedTempBans) return cachedTempBans;
   try {
-    if (!fs.existsSync(TEMPBANS_PATH)) return {};
-    return JSON.parse(fs.readFileSync(TEMPBANS_PATH, 'utf8'));
-  } catch (_) { return {}; }
+    if (!fs.existsSync(TEMPBANS_PATH)) cachedTempBans = {};
+    else cachedTempBans = JSON.parse(fs.readFileSync(TEMPBANS_PATH, 'utf8'));
+  } catch (_) { cachedTempBans = {}; }
+  return cachedTempBans;
 }
 
 function saveTempBans(data) {
-  try { fs.writeFileSync(TEMPBANS_PATH, JSON.stringify(data, null, 2)); } catch (_) {}
+  cachedTempBans = data;
+  fs.promises.writeFile(TEMPBANS_PATH, JSON.stringify(data, null, 2)).catch(e => console.error('[WarnManager] Error saving tempbans:', e));
 }
 
 /**

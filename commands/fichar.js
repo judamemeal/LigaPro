@@ -46,38 +46,43 @@ const EQUIPOS = {
 // ─────────────────────────────────────────────
 //  HELPERS DB
 // ─────────────────────────────────────────────
+let dbCache = null;
+
 function leerDB() {
+  if (dbCache) return dbCache;
   const EMPTY = { jugadores: {}, cooldowns: {}, ofertas_pendientes: {} };
   try {
     if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
     if (!fs.existsSync(DB_PATH)) {
       fs.writeFileSync(DB_PATH, JSON.stringify(EMPTY, null, 2));
-      return EMPTY;
+      dbCache = EMPTY;
+      return dbCache;
     }
     const raw = fs.readFileSync(DB_PATH, 'utf8').trim();
     if (!raw) {
       fs.writeFileSync(DB_PATH, JSON.stringify(EMPTY, null, 2));
-      return EMPTY;
+      dbCache = EMPTY;
+      return dbCache;
     }
     const parsed = JSON.parse(raw);
-    return {
+    dbCache = {
       jugadores:          parsed.jugadores          ?? {},
       cooldowns:          parsed.cooldowns          ?? {},
       ofertas_pendientes: parsed.ofertas_pendientes ?? {},
     };
+    return dbCache;
   } catch (err) {
     console.error('[DB] Error al leer fichajes.json:', err.message);
-    return EMPTY;
+    dbCache = EMPTY;
+    return dbCache;
   }
 }
 
 function guardarDB(data) {
-  try {
-    if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
-    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
-  } catch (e) {
-    console.error('[DB] Error al guardar fichajes.json:', e.message);
-  }
+  dbCache = data;
+  if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
+  fs.promises.writeFile(DB_PATH, JSON.stringify(data, null, 2))
+    .catch(e => console.error('[DB] Error al guardar fichajes.json:', e.message));
 }
 
 function tiempoRelativo(timestamp) {

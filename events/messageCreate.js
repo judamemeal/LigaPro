@@ -97,13 +97,10 @@ function leerSaludados() {
   }
 }
 
-// Función para guardar a un usuario nuevo en la lista
+// Función para guardar a un usuario nuevo en la lista de forma asíncrona
 function marcarSaludado(userId, saludadosSet) {
-  try {
-    fs.writeFileSync(DB_PATH, JSON.stringify(Array.from(saludadosSet), null, 2));
-  } catch (error) {
-    console.error("[Saludos] Error al guardar saludados.json:", error);
-  }
+  fs.promises.writeFile(DB_PATH, JSON.stringify(Array.from(saludadosSet), null, 2))
+    .catch(error => console.error("[Saludos] Error al guardar saludados.json:", error));
 }
 
 // Cargamos la lista a la memoria para que el bot responda de forma ultra rápida
